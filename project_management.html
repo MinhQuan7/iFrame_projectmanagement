@@ -10,6 +10,28 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="https://code.highcharts.com/dashboards/dashboards.js"></script>
     <script src="https://code.highcharts.com/dashboards/modules/layout.js"></script>
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">Project Management Dashboard</h2>
+        <p class="dashboard-description">Current Progress in <b>week 22</b></p>
+    </div>
+    <div id="container">
+        <div class="row">
+            <div class="cell" id="current-sprint-kpi">
+                <div class="row" id="current-sprint">
+                    <div class="cell" id="dashboard-kpi-1"></div>
+                    <div class="cell" id="dashboard-kpi-2"></div>
+                </div>
+            </div>
+            <div class="cell" id="dashboard-kpi-4"></div>
+        </div>
+        <div class="row" id="charts-1">
+            <div class="cell" id="dashboard-chart-1"></div>
+            <div class="cell" id="dashboard-chart-2"></div>
+        </div>
+        <div class="row" id="cumulative">
+            <div class="cell" id="dashboard-chart-cumulative"></div>
+        </div>
+    </div>
     <style>
         @import url("https://code.highcharts.com/css/highcharts.css");
 
@@ -231,28 +253,6 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-header">
-        <h2 class="dashboard-title">Project Management Dashboard</h2>
-        <p class="dashboard-description">Current Progress in <b>week 22</b></p>
-    </div>
-    <div id="container">
-        <div class="row">
-            <div class="cell" id="current-sprint-kpi">
-                <div class="row" id="current-sprint">
-                    <div class="cell" id="dashboard-kpi-1"></div>
-                    <div class="cell" id="dashboard-kpi-2"></div>
-                </div>
-            </div>
-            <div class="cell" id="dashboard-kpi-4"></div>
-        </div>
-        <div class="row" id="charts-1">
-            <div class="cell" id="dashboard-chart-1"></div>
-            <div class="cell" id="dashboard-chart-2"></div>
-        </div>
-        <div class="row" id="cumulative">
-            <div class="cell" id="dashboard-chart-cumulative"></div>
-        </div>
-    </div>
     <script>
         Highcharts.setOptions({
             title: {

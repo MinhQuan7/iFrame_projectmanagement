@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management Dashboard</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/gantt/modules/gantt.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/dashboards/dashboards.js"></script>
+    <script src="https://code.highcharts.com/dashboards/modules/layout.js"></script>
+    <style>
+        @import url("https://code.highcharts.com/css/highcharts.css");
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+        }
+
+        :root,
+        .highcharts-light {
+            --highcharts-color-0: #69a285;
+            --highcharts-color-1: #ffbb07;
+            --highcharts-color-2: #727e8d;
+            --highcharts-color-3: #fc6556;
+            --highcharts-color-5: #404040;
+            --highcharts-neutral-color-100: #000;
+            --highcharts-neutral-color-5: #f2f2f2;
+            --highcharts-neutral-color-3: #f7f7f7;
+            --highcharts-neutral-color-0: #fff;
+            --highcharts-background-color: #fff;
+            --gray: #ccc;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --highcharts-color-0: #93cbae;
+                --highcharts-color-5: #c4c4c4;
+                --gray: #333;
+                --highcharts-background-color: #333;
+                --highcharts-neutral-color-100: rgb(255, 255, 255);
+                --highcharts-neutral-color-5: rgb(61, 61, 61);
+                --highcharts-neutral-color-3: rgb(57, 57, 57);
+                --highcharts-neutral-color-0: rgb(0, 0, 0);
+            }
+        }
+
+        #container {
+            background-color: var(--highcharts-neutral-color-5);
+            padding: 20px 10px;
+            position: relative;
+        }
+
+        .row {
+            display: flex;
+            position: relative;
+        }
+
+        .cell {
+            border: 1px solid transparent;
+            border-radius: 10px;
+            position: relative;
+            min-width: 20px;
+            height: 300px;
+        }
+
+        .highcharts-dashboards-component {
+            color: var(--highcharts-neutral-color-100);
+        }
+
+        .highcharts-dashboards-component-title {
+            font-size: 1.2em;
+            text-align: left;
+            margin: 1em;
+        }
+
+        .cell > .highcharts-dashboards-component {
+            position: relative;
+            background-color: var(--highcharts-background-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin: 5px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dashboard-header .dashboard-title {
+            padding-top: 20px;
+        }
+
+        .dashboard-header .dashboard-title,
+        .dashboard-header .dashboard-description {
+            background-color: var(--highcharts-neutral-color-5);
+            color: var(--highcharts-neutral-color-100);
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .highcharts-dashboards-component-kpi-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .highcharts-dashboards-component.highcharts-dashboards-component-kpi-value {
+            font-size: 4em;
+            margin-top: 40px;
+        }
+
+        .highcharts-dashboards-component-kpi {
+            text-align: center;
+        }
+
+        .highcharts-dashboards-component-kpi-content .highcharts-dashboards-component-subtitle {
+            font-size: 1.4em;
+        }
+
+        #dashboard-kpi-3 .highcharts-dashboards-component .highcharts-point.highcharts-color-0 {
+            fill: var(--highcharts-neutral-color-100);
+        }
+
+        .highcharts-dashboards-component.highcharts-dashboards-component-kpi,
+        .highcharts-dashboards-component.highcharts-dashboards-component-highcharts {
+            border-radius: 10px;
+        }
+
+        .highcharts-dashboards-component.highcharts-dashboards-component-kpi-chart-container .highcharts-background {
+            fill: transparent;
+        }
+
+        #dashboard-chart-1 .highcharts-point.highcharts-color-0,
+        #dashboard-chart-2 .highcharts-color-0 {
+            fill: var(--highcharts-color-5);
+            stroke: var(--highcharts-color-5);
+        }
+
+        #dashboard-chart-2 .highcharts-grid-axis .highcharts-tick,
+        #dashboard-chart-2 .highcharts-axis-line {
+            stroke-width: 0;
+        }
+
+        #dashboard-chart-2 .highcharts-data-label text {
+            fill: var(--highcharts-neutral-color-0);
+        }
+
+        .highcharts-plot-line {
+            stroke-width: 3px;
+            stroke: #f00;
+        }
+
+        .highcharts-plot-line-label {
+            fill: var(--highcharts-neutral-color-100);
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        #dashboard-kpi-1,
+        #dashboard-kpi-2,
+        #dashboard-kpi-4,
+        #current-sprint-kpi {
+            flex: 1 1 50%;
+            height: 300px;
+        }
+
+        #dashboard-chart-1,
+        #dashboard-chart-2,
+        #dashboard-chart-cumulative {
+            height: 350px;
+        }
+
+        #dashboard-chart-1 {
+            flex: 1 1 20%;
+        }
+
+        #dashboard-chart-2 {
+            flex: 1 1 60%;
+        }
+
+        #dashboard-chart-cumulative {
+            flex: 1 1 100%;
+        }
+
+        @media (max-width: 1200px) {
+            #dashboard-kpi-1,
+            #dashboard-kpi-2,
+            #current-sprint-kpi,
+            #dashboard-kpi-4 {
+                flex: 1 1 50%;
+            }
+
+            #dashboard-chart-1 {
+                flex: 1 1 20%;
+            }
+
+            #dashboard-chart-2 {
+                flex: 1 1 60%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .row {
+                flex-direction: column;
+            }
+
+            #current-sprint-kpi {
+                height: auto;
+            }
+
+            #current-sprint.row {
+                flex-direction: row;
+            }
+
+            #dashboard-kpi-1,
+            #dashboard-kpi-2 {
+                flex: 1 1 50%;
+            }
+
+            #dashboard-kpi-4,
+            #dashboard-chart-1,
+            #dashboard-chart-2,
+            #current-sprint-kpi {
+                flex: 1 1 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #current-sprint,
+            #current-sprint.row {
+                flex-direction: column;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">Project Management Dashboard</h2>
+        <p class="dashboard-description">Current Progress in <b>week 22</b></p>
+    </div>
+    <div id="container">
+        <div class="row">
+            <div class="cell" id="current-sprint-kpi">
+                <div class="row" id="current-sprint">
+                    <div class="cell" id="dashboard-kpi-1"></div>
+                    <div class="cell" id="dashboard-kpi-2"></div>
+                </div>
+            </div>
+            <div class="cell" id="dashboard-kpi-4"></div>
+        </div>
+        <div class="row" id="charts-1">
+            <div class="cell" id="dashboard-chart-1"></div>
+            <div class="cell" id="dashboard-chart-2"></div>
+        </div>
+        <div class="row" id="cumulative">
+            <div class="cell" id="dashboard-chart-cumulative"></div>
+        </div>
+    </div>
+    <script>
+        Highcharts.setOptions({
+            title: {
+                style: {
+                    fontSize: '1em'
+                }
+            },
+            subtitle: {
+                style: {
+                    fontSize: '0.75em'
+                }
+            },
+            credits: {
+                enabled: false
+            }
+        });
+
+        // Data for the example dashboard
+        const projectStatus = 95;
+        const timeSpent = 55;
+        const budgetStatus = 65;
+        const tasksRemaining = 25;
+
+        // Create the KPI charts
+        Highcharts.chart('dashboard-kpi-1', {
+            chart: {
+                type: 'solidgauge'
+            },
+            title: {
+                text: 'Project Status'
+            },
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: 'Progress'
+                },
+                stops: [
+                    [0.1, '#DF5353'],
+                    [0.5, '#DDDF0D'],
+                    [0.9, '#55BF3B']
+                ]
+            },
+            series: [{
+                name: 'Status',
+                data: [projectStatus],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:25px">{y}%</span><br/></div>'
+                }
+            }]
+        });
+
+        Highcharts.chart('dashboard-kpi-2', {
+            chart: {
+                type: 'solidgauge'
+            },
+            title: {
+                text: 'Time Spent'
+            },
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: 'Time Spent'
+                },
+                stops: [
+                    [0.1, '#DF5353'],
+                    [0.5, '#DDDF0D'],
+                    [0.9, '#55BF3B']
+                ]
+            },
+            series: [{
+                name: 'Time Spent',
+                data: [timeSpent],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:25px">{y}%</span><br/></div>'
+                }
+            }]
+        });
+
+        Highcharts.chart('dashboard-kpi-4', {
+            chart: {
+                type: 'solidgauge'
+            },
+            title: {
+                text: 'Budget Status'
+            },
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: 'Budget'
+                },
+                stops: [
+                    [0.1, '#DF5353'],
+                    [0.5, '#DDDF0D'],
+                    [0.9, '#55BF3B']
+                ]
+            },
+            series: [{
+                name: 'Budget',
+                data: [budgetStatus],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:25px">{y}%</span><br/></div>'
+                }
+            }]
+        });
+
+        // Create the line chart for task completion
+        Highcharts.chart('dashboard-chart-1', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Task Completion'
+            },
+            xAxis: {
+                categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
+            },
+            yAxis: {
+                title: {
+                    text: 'Tasks'
+                }
+            },
+            series: [{
+                name: 'Tasks Remaining',
+                data: [45, 35, 20, tasksRemaining]
+            }]
+        });
+
+        // Create the bar chart for weekly progress
+        Highcharts.chart('dashboard-chart-2', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Weekly Progress'
+            },
+            xAxis: {
+                categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
+            },
+            yAxis: {
+                title: {
+                    text: 'Progress'
+                }
+            },
+            series: [{
+                name: 'Progress',
+                data: [30, 45, 60, 75]
+            }]
+        });
+
+        // Create the cumulative progress chart
+        Highcharts.chart('dashboard-chart-cumulative', {
+            chart: {
+                type: 'area'
+            },
+            title: {
+                text: 'Cumulative Progress'
+            },
+            xAxis: {
+                categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
+            },
+            yAxis: {
+                title: {
+                    text: 'Cumulative Progress'
+                }
+            },
+            series: [{
+                name: 'Cumulative Progress',
+                data: [30, 75, 135, 210]
+            }]
+        });
+    </script>
+</body>
+</html>
